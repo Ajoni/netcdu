@@ -5,4 +5,8 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Terminal.Gui" Version="1.0.0-pre.1-tv-rc" />
+  </ItemGroup>
+
 </Project>
