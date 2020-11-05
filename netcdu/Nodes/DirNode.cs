@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Terminal.Gui;
 using Terminal.Gui.Views;
@@ -12,11 +13,13 @@ namespace netcdu.Nodes
     {
         public string _nodeName { get; set; }
         private object data;
-        private readonly List<ITreeViewItem> _children;
+        private readonly string path;
+        private List<ITreeViewItem> _children;
 
-        public DirNode(string nodeName, List<ITreeViewItem> children = null)
+        public DirNode(string path, List<ITreeViewItem> children = null)
         {
-            _nodeName = nodeName;
+            _nodeName = path.GetFileNameFromPath();
+            this.path = path;
             _children = children ?? new List<ITreeViewItem>();
             foreach (var child in _children)
                 child.Parent = this;
@@ -51,7 +54,7 @@ namespace netcdu.Nodes
                     sb.Append('-');
             }
 
-            sb.Append(_nodeName);
+            sb.Append($"  {((long)Data).LongToStringSize()}  {_nodeName}");
 
             RenderUstr(driver, sb.ToString(), col, line, width);
         }
@@ -91,6 +94,36 @@ namespace netcdu.Nodes
                 }
             }
             return list;
+        }
+
+        public void OrderBySizeDesc()
+        {
+            _children = _children.OrderByDescending(x => (long)x.Data).ToList();
+            foreach (INetcduNode child in _children)
+                child.OrderBySizeDesc();
+        }
+
+        public override string ToString()
+        {
+            return path;
+        }
+
+        public void Delete()
+        {
+            var parent = (DirNode)Parent;
+            parent.Children.Remove(this);
+            parent.RecalculateSize();
+        }
+
+        public void RecalculateSize()
+        {
+            var size = 0L;
+            foreach (var child in Children)
+                size += (long)child.Data;
+            Size = size;
+
+            if(Parent!=null)
+                ((DirNode)Parent).RecalculateSize();
         }
     }
 }

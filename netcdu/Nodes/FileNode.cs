@@ -13,10 +13,12 @@ namespace netcdu.Nodes
     {
         public string _nodeName { get; set; }
         private object data;
+        private readonly string path;
 
-        public FileNode(string nodeName, long size)
+        public FileNode(string path, long size)
         {
-            _nodeName = nodeName;
+            _nodeName = path.GetFileNameFromPath();
+            this.path = path;
             Data = size;
         }
         public object Data { get => data; set => data = value; }
@@ -46,7 +48,7 @@ namespace netcdu.Nodes
                     sb.Append('-');
             }
 
-            sb.Append(_nodeName);
+            sb.Append($"  {((long)Data).LongToStringSize()}  {_nodeName}");
 
             RenderUstr(driver, sb.ToString(), col, line, width);
         }
@@ -76,6 +78,23 @@ namespace netcdu.Nodes
             var list = new List<ITreeViewItem>();
             list.Add(this);
             return list;
+        }
+
+        public void OrderBySizeDesc()
+        {
+            return; // get out of here s.t.a.l.k.e.r :)
+        }
+
+        public override string ToString()
+        {
+            return path;
+        }
+
+        public void Delete()
+        {
+            var parent = (DirNode)Parent;
+            parent.Children.Remove(this);
+            parent.RecalculateSize();
         }
     }
 }
