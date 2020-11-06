@@ -1,8 +1,11 @@
 ﻿using netcdu.Nodes;
 using netcdu.Scanning;
 using netcdu.Scanning.Strategies;
+using NStack;
 using System;
+using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using Terminal.Gui;
 using Terminal.Gui.Views;
 
@@ -10,19 +13,15 @@ namespace netcdu
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
+            var path = @"E:\dump";
             Application.Init();
             var top = Application.Top;
             var window = new Window(new Rect(0, 1, top.Frame.Width, top.Frame.Height - 1), "netcdu");
 
-            var fs = new FileScanner(@"E:\dump\dupa", new DefaultGetFileSizeStrategy());
-            foreach (var item in fs.ContinueScan())
-            {
-                //Console.WriteLine(item);
-            }
+            var fs = new FileScanner(path, new DefaultGetFileSizeStrategy());
 
-            fs.Root.OrderBySizeDesc();
             var tree = new TreeView(fs.Root)
             {
                 X = 1,
@@ -38,8 +37,26 @@ namespace netcdu
             new StatusItem(Key.F2, "~F2~ Delete", () => Delete(tree) ),
             });
             var menu = new MenuBar();
-            top.Add(statusBar,window,menu);
-
+            var label = new TextField("Scan in progress...") { ReadOnly = true, Width = Dim.Fill() - 4 };
+            top.Add(statusBar, window, menu, label);
+            top.Ready += async () =>
+            {
+                var sw = new Stopwatch();
+                sw.Start();
+                await foreach (var item in fs.ContinueScan())
+                {
+                    if(sw.ElapsedMilliseconds>200)
+                    {
+                        await Task.Delay(1);
+                        label.Text = item;
+                        sw.Restart();
+                    }
+                }
+                label.Text = string.Empty;
+                sw.Stop();
+                sw = null;
+                fs.Root.OrderBySizeDesc();
+            };
             Application.Run(top);
         }
 
@@ -60,5 +77,6 @@ namespace netcdu
                 tv.SelectedItem = nodeToDelete.Parent;
             }
         }
+
     }
 }

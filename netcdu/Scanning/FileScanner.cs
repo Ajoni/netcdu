@@ -24,13 +24,13 @@ namespace netcdu.Scanning
             _rootNode = new DirNode(root);
         }
 
-        public IEnumerable<string> ContinueScan()
+        public async IAsyncEnumerable<string> ContinueScan()
         {
             foreach (var dir in Directory.EnumerateDirectories(_root))
             {
                 if (DirNotReadable(dir))
                     continue;
-                foreach (var nodePath in ContinueScanRec(dir, _rootNode))
+                await foreach (var nodePath in ContinueScanRec(dir, _rootNode))
                     yield return nodePath;
             }
 
@@ -46,7 +46,7 @@ namespace netcdu.Scanning
             yield return _root;
         }
 
-        private IEnumerable<string> ContinueScanRec(string root, DirNode parent)
+        private async IAsyncEnumerable<string> ContinueScanRec(string root, DirNode parent)
         {
             var dirNode = new DirNode(root);
             parent.Children.Add(dirNode);
@@ -56,7 +56,7 @@ namespace netcdu.Scanning
             {
                 if (DirNotReadable(dir))
                     continue;
-                foreach (var nodePath in ContinueScanRec(dir, dirNode))
+                await foreach (var nodePath in ContinueScanRec(dir, dirNode))
                     yield return nodePath;
             }
             foreach (var file in Directory.EnumerateFiles(root))

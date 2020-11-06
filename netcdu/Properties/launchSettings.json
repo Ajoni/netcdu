@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "netcdu": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\"
+    }
+  }
+}
