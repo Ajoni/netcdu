@@ -26,7 +26,6 @@ namespace netcdu.Nodes
             Data = 0L;
         }
 
-        public long Size { get; private set; }
         public object Data { get => data; set => data = value; }
         public ITreeViewItem Parent { get; set; }
         public int Count => _children.Count;
@@ -45,13 +44,10 @@ namespace netcdu.Nodes
             if (level > 0)
             {
                 sb.Append('|');
-                if (Children != null && Children.Count > 0)
-                    if (IsExpanded)
-                        sb.Append("^");
-                    else
-                        sb.Append('v');
+                if (IsExpanded)
+                    sb.Append("^");
                 else
-                    sb.Append('-');
+                    sb.Append('v');
             }
 
             sb.Append($"  {((long)Data).LongToStringSize()}  {_nodeName}");
@@ -120,7 +116,7 @@ namespace netcdu.Nodes
             var size = 0L;
             foreach (var child in Children)
                 size += (long)child.Data;
-            Size = size;
+            Data = size;
 
             if(Parent!=null)
                 ((DirNode)Parent).RecalculateSize();

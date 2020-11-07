@@ -15,7 +15,7 @@ namespace netcdu
     {
         static async Task Main(string[] args)
         {
-            var path = @"E:\dump";
+            var path = @"E:\test";
             Application.Init();
             var top = Application.Top;
             var window = new Window(new Rect(0, 1, top.Frame.Width, top.Frame.Height - 1), "netcdu");
@@ -32,7 +32,7 @@ namespace netcdu
                 AllowsMultipleSelection = false
             };
             window.Add(tree);
-            var statusBar = new StatusBar(new StatusItem[] {
+            var statusBar = new StatusBar(new [] {
             new StatusItem(Key.F1, "~F1~ Help", () => Help() ),
             new StatusItem(Key.F2, "~F2~ Delete", () => Delete(tree) ),
             });
@@ -52,7 +52,7 @@ namespace netcdu
                         sw.Restart();
                     }
                 }
-                label.Text = string.Empty;
+                top.Remove(label);
                 sw.Stop();
                 sw = null;
                 fs.Root.OrderBySizeDesc();
@@ -75,6 +75,7 @@ namespace netcdu
                 ((INetcduNode)nodeToDelete).Delete();
 
                 tv.SelectedItem = nodeToDelete.Parent;
+                tv.SetNeedsDisplay();
             }
         }
 
