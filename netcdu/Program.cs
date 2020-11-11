@@ -15,27 +15,31 @@ namespace netcdu
     {
         static void Main(string[] args)
         {
+            if (args.Length == 0)
+            {
+                Console.WriteLine("netcdu requires a single path arg pointing to a directory");
+                return;
+            }
+
             var path = args[0];
             var fs = new FileScanner(path, new DefaultGetFileSizeStrategy());
 
             Application.Init();
             var top = Application.Top;
             var window = new Window(new Rect(0, 1, top.Frame.Width, top.Frame.Height - 1), "netcdu");
-            var label = new TextField("Scan in progress...") { ReadOnly = true, Width = top.Frame.Width };
             var tree = new TreeView
             {
-                X = 1,
-                Y = 1,
+                X = 0,
+                Y = 0,
                 Width = Dim.Fill() - 4,
                 Height = Dim.Fill() - 4,
                 AllowsMarking = true,
                 AllowsMultipleSelection = false
             };
             window.Add(tree);
-
             var statusBar = new StatusBar(new [] {
             new StatusItem(Key.F1, "~F1~ Help", Help ),
-            new StatusItem(Key.F2, "~F2~ Go up",async() => await GoUp(label,fs,top,tree) ),
+            new StatusItem(Key.F2, "~F2~ Go up",async() => await GoUp(window,fs,top,tree) ),
             new StatusItem(Key.F3, "~F3~ Delete", () => Delete(tree) ),
             new StatusItem(Key.F4, "~F4~ Exit", Application.RequestStop ),
             });
@@ -43,8 +47,10 @@ namespace netcdu
             
             top.Add(statusBar, window, menu);
 
-            top.Ready += async()=>await ScanFiles(label,fs,top, tree);
+            top.Ready += async()=>await ScanFiles(window,fs,top, tree);
             Application.Run(top);
+
+            Console.Clear();
         }
 
         static void Help()
@@ -58,12 +64,12 @@ F4 - Bye bye
 ", "Ok");
         }
 
-        static async Task GoUp(TextField label, FileScanner fs, Toplevel top, TreeView tree)
+        static async Task GoUp(Window window, FileScanner fs, Toplevel top, TreeView tree)
         {
             if(!fs.GoUp())
                 return;
-
-            await ScanFiles(label, fs, top,tree);
+            tree.Root = null;
+            await ScanFiles(window, fs, top,tree);
         }
 
         static void Delete(TreeView tv)
@@ -80,9 +86,9 @@ F4 - Bye bye
             }
         }
 
-        static async Task ScanFiles(TextField label, FileScanner fs, Toplevel top, TreeView tree)
+        static async Task ScanFiles(Window window, FileScanner fs, Toplevel top, TreeView tree)
         {
-            top.Add(label);
+            top.Add(window);
             var sw = new Stopwatch();
             sw.Start();
             await foreach (var item in fs.ContinueScan())
@@ -90,12 +96,12 @@ F4 - Bye bye
                 if (sw.ElapsedMilliseconds > 200)
                 {
                     await Task.Delay(1);
-                    label.Text = item;
+                    window.Title = $"Scan in progress... {item}";
                     sw.Restart();
                 }
             }
 
-            top.Remove(label);
+            window.Title = "netcdu";
             sw.Stop();
             sw = null;
             fs.Root.OrderBySizeDesc();
