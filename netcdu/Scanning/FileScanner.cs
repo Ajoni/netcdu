@@ -11,9 +11,10 @@ namespace netcdu.Scanning
 {
     public class FileScanner
     {
-        private readonly string _root;
+        private string _root;
         private readonly IGetFileSizeStrategy _getFileSizeStrategy;
         private DirNode _rootNode;
+        private List<string> _prevRoots;
 
         public INetcduNode Root => _rootNode;
 
@@ -22,11 +23,12 @@ namespace netcdu.Scanning
             _root = root;
             _getFileSizeStrategy = getFileSizeStrategy;
             _rootNode = new DirNode(root);
+            _prevRoots = new List<string> {_root};
         }
 
         public async IAsyncEnumerable<string> ContinueScan()
         {
-            foreach (var dir in Directory.EnumerateDirectories(_root))
+            foreach (var dir in Directory.EnumerateDirectories(_root).Except(_prevRoots))
             {
                 if (DirNotReadable(dir))
                     continue;
@@ -38,10 +40,8 @@ namespace netcdu.Scanning
             {
                 var size = _getFileSizeStrategy.GetSize(file);
                 _rootNode.Children.Add(new FileNode(file, size) { Parent = _rootNode });
+                _rootNode.Data = (long) _rootNode.Data + size;
             }
-
-            foreach (var child in _rootNode.Children)
-                _rootNode.Data = (long)_rootNode.Data + (long)child.Data;
 
             yield return _root;
         }
@@ -69,7 +69,20 @@ namespace netcdu.Scanning
 
             yield return root;
         }
-    
+
+        public bool GoUp()
+        {
+            if (_root.Count(f => f == '\\') < 2)
+                return false;
+
+            _root = _root.Substring(0,_root.LastIndexOf('\\'));
+            var prevRootNode = _rootNode;
+            _rootNode = new DirNode(_root, new List<ITreeViewItem>{ prevRootNode });
+            _rootNode.Data = prevRootNode.Data;
+
+            return true;
+        }
+        
         bool DirNotReadable(string path)
         {
             try
