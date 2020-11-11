@@ -15,7 +15,7 @@ namespace netcdu
     {
         static async Task Main(string[] args)
         {
-            var path = @"E:\dump\polski";
+            var path = @"E:\test";
             Application.Init();
             var top = Application.Top;
             var window = new Window(new Rect(0, 1, top.Frame.Width, top.Frame.Height - 1), "netcdu");

@@ -48,7 +48,7 @@ namespace netcdu.Nodes
                     sb.Append('-');
             }
 
-            sb.Append($"  {((long)Data).LongToStringSize()}  {_nodeName}");
+            sb.Append($" {_nodeName} {((long)Data).LongToStringSize()}");
 
             RenderUstr(driver, sb.ToString(), col, line, width);
         }

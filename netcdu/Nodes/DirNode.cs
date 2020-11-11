@@ -50,7 +50,7 @@ namespace netcdu.Nodes
                     sb.Append('v');
             }
 
-            sb.Append($"  {((long)Data).LongToStringSize()}  {_nodeName}");
+            sb.Append($" /{_nodeName} {((long)Data).LongToStringSize()}");
 
             RenderUstr(driver, sb.ToString(), col, line, width);
         }
