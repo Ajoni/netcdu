@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Permissions;
 using Terminal.Gui.Views;
 
@@ -15,6 +16,7 @@ namespace netcdu.Scanning
         private readonly IGetFileSizeStrategy _getFileSizeStrategy;
         private DirNode _rootNode;
         private List<string> _prevRoots;
+        private readonly char _pathSeparator;
 
         public INetcduNode Root => _rootNode;
 
@@ -24,6 +26,7 @@ namespace netcdu.Scanning
             _getFileSizeStrategy = getFileSizeStrategy;
             _rootNode = new DirNode(root);
             _prevRoots = new List<string> {_root};
+            _pathSeparator = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? '\\' : '/';
         }
 
         public async IAsyncEnumerable<string> ContinueScan()
@@ -72,10 +75,10 @@ namespace netcdu.Scanning
 
         public bool GoUp()
         {
-            if (_root.Count(f => f == '\\') < 2)
+            if (_root.Count(f => f == _pathSeparator) == 1)
                 return false;
 
-            _root = _root.Substring(0,_root.LastIndexOf('\\'));
+            _root = _root.Substring(0,_root.LastIndexOf(_pathSeparator));
             var prevRootNode = _rootNode;
             _rootNode = new DirNode(_root, new List<ITreeViewItem>{ prevRootNode });
             _rootNode.Data = prevRootNode.Data;

@@ -1,10 +1,13 @@
-﻿namespace netcdu
+﻿using System.Runtime.InteropServices;
+
+namespace netcdu
 {
     public static class Extensions
     {
+        private static char _pathSeparator = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? '\\' : '/';
         public static string GetFileNameFromPath(this string path)
         {
-            return path.Substring(path.LastIndexOf('\\') + 1);
+            return path.Substring(path.LastIndexOf(_pathSeparator) + 1);
         }
 
         public static string LongToStringSize(this long size)
