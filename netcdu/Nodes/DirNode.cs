@@ -75,7 +75,7 @@ namespace netcdu.Nodes
             }
         }
 
-        public IList ToList()
+        public IList<ITreeViewItem> ToList()
         {
             var list = new List<ITreeViewItem>();
             list.Add(this);

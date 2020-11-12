@@ -57,6 +57,7 @@ namespace netcdu
         {
             MessageBox.Query(50, 7, "Help", 
 @"
+TAB - expand/shrink dir node
 F1 - Brings you here
 F2 - Goes up one directory if possible and then scans it
 F3 - Brings up a delete file/dir dialog
