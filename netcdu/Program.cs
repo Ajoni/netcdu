@@ -5,6 +5,8 @@ using NStack;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Terminal.Gui;
 using Terminal.Gui.Views;
@@ -13,15 +15,30 @@ namespace netcdu
 {
     class Program
     {
+        private readonly static string[] Parameters = new[] { "-p", "-v", "-h", "help" };
+
+        private const string MenuHelp = @"TAB - Expand/Collapse directory node
+F1 - Opens menu help dialog
+F2 - Goes up one directory if possible and then scans it
+F3 - Brings up a delete file/directory dialog
+F4 - Closes the application
+";
+
         static void Main(string[] args)
         {
-            if (args.Length == 0)
+            // The working directory is the default scanned path.
+            // This can be overridden with the -p parameter.
+            var path = Directory.GetCurrentDirectory();
+
+            if (args.Length > 0)
             {
-                Console.WriteLine("netcdu requires a single path arg pointing to a directory");
-                return;
+                if (HandleParameters(args, ref path))
+                {
+                    Console.ReadKey();
+                    return;
+                }
             }
 
-            var path = args[0];
             var fs = new FileScanner(path, new DefaultGetFileSizeStrategy());
 
             Application.Init();
@@ -53,16 +70,88 @@ namespace netcdu
             Console.Clear();
         }
 
+        private static bool HandleParameters(string[] args, ref string path)
+        {
+            // For now, netcdu will support only one parameter at a time, for simplicity's sake.
+            var parameter = args[0];
+            if (!Parameters.Contains(parameter))
+            {
+                PrintHelp($"Unrecognized parameter {parameter}");
+                return true;
+            }
+
+            if (parameter == "-h" || parameter == "help")
+            {
+                PrintHelp();
+                return true;
+            }
+
+            if (parameter == "-v")
+            {
+                PrintVersion();
+                return true;
+            }
+
+            if (parameter == "-p")
+            {
+                if (args.Length != 2)
+                {
+                    PrintHelp($"Unexpected parameter count. Expected '-p' and a path, got the following parameters: [{string.Join(", ", args)}]");
+                    return true;
+                }
+
+                var tmpPath = args[1]; // Could be a file or a directory
+                var directoryExists = Directory.Exists(tmpPath);
+                var fileExists = File.Exists(tmpPath);
+                if (!directoryExists && !fileExists)
+                {
+                    Console.WriteLine($"Supplied path: '{tmpPath}' does not exist.");
+                    return true;
+                }
+
+                if (directoryExists)
+                {
+                    path = tmpPath;
+                    return false;
+                }
+                else // fileExists
+                {
+                    var parentFolder = Path.GetDirectoryName(tmpPath);
+                    path = parentFolder;
+                    return false;
+                }
+            }
+
+            throw new Exception(); // Should never happen.
+        }
+
+        private static void PrintVersion()
+        {
+            var version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            Console.WriteLine($"netcdu, version: {version}");
+        }
+
+        private static void PrintHelp(string error = null)
+        {
+            if (error != null)
+                Console.WriteLine(error);
+            Console.WriteLine("netcdu - .NET Curses Disk Usage");
+            Console.WriteLine("Parameters:");
+            Console.WriteLine("-p, Path of directory to scan from. Example: netcdu -p C:\\");
+            Console.WriteLine("\tIf this parameter is not supplied the working directory is used.");
+            Console.WriteLine("\tIf a file is supplied, then it's parent directory will be used.");
+            Console.WriteLine("-v, Prints the current version of the application. Example: netcdu -v");
+            Console.WriteLine("-h|help, Prints this text. Example: netcdu -h");
+            Console.WriteLine();
+            Console.WriteLine("Menu help:");
+            Console.Write(MenuHelp);
+        }
+
+
+
         static void Help()
         {
-            MessageBox.Query(50, 7, "Help", 
-@"
-TAB - expand/shrink dir node
-F1 - Brings you here
-F2 - Goes up one directory if possible and then scans it
-F3 - Brings up a delete file/dir dialog
-F4 - Bye bye
-", "Ok");
+            MessageBox.Query(50, 10, "Help", MenuHelp, "Ok");
         }
 
         static async Task GoUp(Window window, FileScanner fs, Toplevel top, TreeView tree)
