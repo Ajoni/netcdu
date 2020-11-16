@@ -42,8 +42,10 @@ F4 - Closes the application
             var fs = new FileScanner(path, new DefaultGetFileSizeStrategy());
 
             Application.Init();
+            Colors.Base.Normal      = Application.Driver.MakeAttribute(Color.White, Color.Black);
+            Colors.Base.HotNormal   = Application.Driver.MakeAttribute(Color.White, Color.Black);
             var top = Application.Top;
-            var window = new Window(new Rect(0, 1, top.Frame.Width, top.Frame.Height - 1), "netcdu");
+            var window = new Window(new Rect(0, 1, top.Frame.Width, top.Frame.Height - 2), "netcdu");
             var tree = new TreeView
             {
                 X = 0,
