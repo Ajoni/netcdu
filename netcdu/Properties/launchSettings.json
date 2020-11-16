@@ -1,8 +1,7 @@
 {
   "profiles": {
     "netcdu": {
-      "commandName": "Project",
-      "commandLineArgs": "E:\\dump"
+      "commandName": "Project"
     }
   }
 }
