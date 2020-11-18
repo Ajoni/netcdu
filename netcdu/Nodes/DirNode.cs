@@ -26,6 +26,8 @@ namespace netcdu.Nodes
             Data = 0L;
         }
 
+        public string Path { get { return path; } }
+
         public object Data { get => data; set => data = value; }
         public ITreeViewItem Parent { get; set; }
         public int Count => _children.Count;

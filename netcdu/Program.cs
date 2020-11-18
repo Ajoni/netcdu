@@ -192,7 +192,7 @@ F4 - Closes the application
                 }
             }
 
-            window.Title = "netcdu";
+            window.Title = ((DirNode)fs.Root).Path;
             sw.Stop();
             sw = null;
             fs.Root.OrderBySizeDesc();
