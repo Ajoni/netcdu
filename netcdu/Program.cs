@@ -34,7 +34,6 @@ F4 - Closes the application
             {
                 if (HandleParameters(args, ref path))
                 {
-                    Console.ReadKey();
                     return;
                 }
             }
