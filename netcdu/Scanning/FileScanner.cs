@@ -16,7 +16,6 @@ namespace netcdu.Scanning
         private readonly IGetFileSizeStrategy _getFileSizeStrategy;
         private DirNode _rootNode;
         private List<string> _prevRoots;
-        private readonly char _pathSeparator;
 
         public INetcduNode Root => _rootNode;
 
@@ -26,7 +25,6 @@ namespace netcdu.Scanning
             _getFileSizeStrategy = getFileSizeStrategy;
             _rootNode = new DirNode(root);
             _prevRoots = new List<string> {_root};
-            _pathSeparator = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? '\\' : '/';
         }
 
         public async IAsyncEnumerable<string> ContinueScan()
