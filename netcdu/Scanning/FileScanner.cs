@@ -81,6 +81,7 @@ namespace netcdu.Scanning
             var prevRootNode = _rootNode;
             _rootNode = new DirNode(_root, new List<ITreeViewItem>{ prevRootNode });
             _rootNode.Data = prevRootNode.Data;
+            _prevRoots.Add(rootDirInfo.FullName);
 
             return true;
         }
