@@ -75,10 +75,11 @@ namespace netcdu.Scanning
 
         public bool GoUp()
         {
-            if (_root.Count(f => f == _pathSeparator) == 1 && _root.LastIndexOf(_pathSeparator)==_root.Length-1)
+            var rootDirInfo = new DirectoryInfo(_root);
+            if (rootDirInfo.Parent == null)
                 return false;
 
-            _root = _root.Substring(0,_root.LastIndexOf(_pathSeparator)+1);
+            _root = rootDirInfo.Parent.FullName;
             var prevRootNode = _rootNode;
             _rootNode = new DirNode(_root, new List<ITreeViewItem>{ prevRootNode });
             _rootNode.Data = prevRootNode.Data;
