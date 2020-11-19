@@ -21,6 +21,7 @@ namespace netcdu.Nodes
             this.path = path;
             Data = size;
         }
+        public string Path { get { return path; } }
         public object Data { get => data; set => data = value; }
         public ITreeViewItem Parent { get; set; }
         public int Count => 1;

@@ -21,10 +21,8 @@ namespace netcdu.Scanning
 
         public FileScanner(string root, IGetFileSizeStrategy getFileSizeStrategy)
         {
-            _root = root;
             _getFileSizeStrategy = getFileSizeStrategy;
-            _rootNode = new DirNode(root);
-            _prevRoots = new List<string> {_root};
+            Reset(root);
         }
 
         public async IAsyncEnumerable<string> ContinueScan()
@@ -98,6 +96,13 @@ namespace netcdu.Scanning
             }
 
             return false;
+        }
+
+        internal void Reset(string root)
+        {
+            _root = root;
+            _rootNode = new DirNode(root);
+            _prevRoots = new List<string> { _root };
         }
     }
 }

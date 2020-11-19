@@ -22,6 +22,7 @@ F1 - Opens menu help dialog
 F2 - Goes up one directory if possible and then scans it
 F3 - Brings up a delete file/directory dialog
 F4 - Closes the application
+F5 - Refreshes the files and folders by re-scanning the current directory
 ";
 
         static void Main(string[] args)
@@ -56,10 +57,11 @@ F4 - Closes the application
             };
             window.Add(tree);
             var statusBar = new StatusBar(new[] {
-            new StatusItem(Key.F1, "~F1~ Help", Help ),
-            new StatusItem(Key.F2, "~F2~ Go up",async() => await GoUp(window,fs,top,tree) ),
-            new StatusItem(Key.F3, "~F3~ Delete", () => Delete(tree) ),
-            new StatusItem(Key.F4, "~F4~ Exit", Application.RequestStop ),
+                new StatusItem(Key.F1, "~F1~ Help", Help ),
+                new StatusItem(Key.F2, "~F2~ Go up",async() => await GoUp(window,fs,top,tree) ),
+                new StatusItem(Key.F3, "~F3~ Delete", () => Delete(tree) ),
+                new StatusItem(Key.F4, "~F4~ Exit", Application.RequestStop ),
+                new StatusItem(Key.F5, "~F5~ Refresh", async() => await Refresh(window,fs,top,tree) ),
             });
             var menu = new MenuBar();
 
@@ -152,13 +154,20 @@ F4 - Closes the application
 
         static void Help()
         {
-            MessageBox.Query(50, 10, "Help", MenuHelp, "Ok");
+            MessageBox.Query(50, 11, "Help", MenuHelp, "Ok");
         }
 
         static async Task GoUp(Window window, FileScanner fs, Toplevel top, TreeView tree)
         {
             if (!fs.GoUp())
                 return;
+            tree.Root = null;
+            await ScanFiles(window, fs, top, tree);
+        }
+
+        static async Task Refresh(Window window, FileScanner fs, Toplevel top, TreeView tree)
+        {
+            fs.Reset(fs.Root.Path);
             tree.Root = null;
             await ScanFiles(window, fs, top, tree);
         }
