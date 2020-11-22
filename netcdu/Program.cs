@@ -192,6 +192,9 @@ F5 - Refreshes the files and folders by re-scanning the current directory
 
         static async Task ScanFiles(Window window, FileScanner fs, Toplevel top, TreeView tree)
         {
+            var benchmarkStopwatch = new Stopwatch();
+            benchmarkStopwatch.Start();
+
             top.Add(window);
             var sw = new Stopwatch();
             sw.Start();
@@ -210,6 +213,10 @@ F5 - Refreshes the files and folders by re-scanning the current directory
             sw = null;
             fs.Root.OrderBySizeDesc();
             tree.Root = fs.Root;
+
+            benchmarkStopwatch.Stop();
+
+            MessageBox.Query("Time elapsed", $"{benchmarkStopwatch.ElapsedMilliseconds} miliseconds", "OK");
         }
 
     }
