@@ -50,9 +50,9 @@ F5 - Refreshes the files and folders by re-scanning the current directory
             {
                 X = 0,
                 Y = 0,
-                Width = Dim.Fill() - 4,
-                Height = Dim.Fill() - 4,
-                AllowsMarking = true,
+                Width = Dim.Fill(),
+                Height = Dim.Fill(),
+                AllowsMarking = false,
                 AllowsMultipleSelection = false
             };
             window.Add(tree);
