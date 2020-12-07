@@ -7,6 +7,8 @@ This tool uses a custom fork of the Terminal.Gui toolkit (https://github.com/mig
 
 The custom fork is located at https://github.com/Ajoni/gui.cs
 
+![](images/Sample.png)
+
 # Statistics
 An obvious weakness of this tool are directories with tons of small files.
 
