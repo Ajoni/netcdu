@@ -5,6 +5,10 @@ A small, multi-platform tool written in .NET Core, which allows you to view size
 
 This tool uses a custom fork of the Terminal.Gui toolkit (https://github.com/migueldeicaza/gui.cs) as it's curses library.
 
+The custom fork is located at https://github.com/Ajoni/gui.cs
+
+![](images/Sample.png)
+
 # Statistics
 An obvious weakness of this tool are directories with tons of small files.
 
