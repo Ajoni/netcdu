@@ -17,7 +17,7 @@ namespace netcdu
     {
         private readonly static string[] Parameters = new[] { "-p", "-v", "-h", "help" };
 
-        private const string MenuHelp = @"TAB - Expand/Collapse directory node
+        private const string MenuHelp = @"TAB and ENTER - Expand/Collapse directory node
 F1 - Opens menu help dialog
 F2 - Goes up one directory if possible and then scans it
 F3 - Brings up a delete file/directory dialog
@@ -55,6 +55,7 @@ F5 - Refreshes the files and folders by re-scanning the current directory
                 AllowsMarking = false,
                 AllowsMultipleSelection = false
             };
+            tree.KeyPress += e => ExpandCollapse(e, tree);
             window.Add(tree);
             var statusBar = new StatusBar(new[] {
                 new StatusItem(Key.F1, "~F1~ Help", Help ),
@@ -210,6 +211,15 @@ F5 - Refreshes the files and folders by re-scanning the current directory
             sw = null;
             fs.Root.OrderBySizeDesc();
             tree.Root = fs.Root;
+        }
+
+        static void ExpandCollapse(View.KeyEventEventArgs e, TreeView tv)
+        {
+            if (e.KeyEvent.Key == Key.Enter)
+            {
+                tv.OnExpandOrCollapseSelectedItem();
+                e.Handled = true;
+            }
         }
 
     }
